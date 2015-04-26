@@ -13,5 +13,6 @@ curl -i -X DELETE http://localhost:3000/traces/3 --header "Content-Type: applica
 Tasks:
 
 rake points:update_distance             # Calculates and updates distance for existing points
+
 rake points:update_elevation            # Calculates and updates elevation for existing points
 
