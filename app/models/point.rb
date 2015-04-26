@@ -7,6 +7,8 @@ class Point < ActiveRecord::Base
   validates_numericality_of :distance, :elevation, greater_than_or_equal_to: 0
   validates_presence_of :trace
 
+  scope :in_trace, -> (trace_id) { where(trace_id: trace_id) }
+
   class << self
     def import_trace_points(trace, points_data)
       new_points = build_points(trace, points_data)

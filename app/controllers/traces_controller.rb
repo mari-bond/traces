@@ -53,6 +53,14 @@ class TracesController < ApplicationController
   end
 
   def find_trace
-    @trace = Trace.includes(:points).find(params[:id])
+    @trace = Rails.cache.fetch(trace_cache_key) do
+      Trace.includes(:points).find(params[:id])
+    end
+  end
+
+  def trace_cache_key
+    last_point_id = Point.in_trace(params[:id]).last.try(:id)
+
+    ['traces', params[:id], last_point_id].join("/")
   end
 end
