@@ -24,9 +24,11 @@ RSpec.describe Point, type: :model do
     new_points = [build(:point), build(:point)]
     Point.stub(:build_points).with(trace, [poin1_data, poin2_data]).and_return(new_points)
     Point.stub(:import)
+    columns = [:trace_id, :latitude, :longitude, :distance, :elevation]
+    values = new_points.map{|pt| [pt.trace_id, pt.latitude, pt.longitude, pt.distance, pt.elevation] }
     Point.import_trace_points(trace, [poin1_data, poin2_data])
 
-    expect(Point).to have_received(:import).with(new_points)
+    expect(Point).to have_received(:import).with(columns, values, validate: false)
   end
 
   describe 'should build trace points' do

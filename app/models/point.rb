@@ -10,7 +10,10 @@ class Point < ActiveRecord::Base
   class << self
     def import_trace_points(trace, points_data)
       new_points = build_points(trace, points_data)
-      import(new_points)
+      columns = [:trace_id, :latitude, :longitude, :distance, :elevation]
+      values = new_points.map{|pt| [pt.trace_id, pt.latitude, pt.longitude, pt.distance, pt.elevation] }
+
+      import columns, values, validate: false
     end
 
     private
@@ -30,10 +33,20 @@ class Point < ActiveRecord::Base
           points << point
         end
       end
-      elevations = PointElevationFetcher.new(points).fetch
+      elevations = find_points_elevations(points)
       points.map.with_index{|point, index| point.elevation = elevations[index] } if elevations
 
       points
+    end
+
+    def find_points_elevations(points)
+      elevations = []
+      points.in_groups_of(100).each do |group|
+        group.reject!(&:blank?)
+        elevations += PointElevationFetcher.new(group).fetch
+      end
+
+      elevations
     end
   end
 end
