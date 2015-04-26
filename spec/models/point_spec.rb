@@ -4,6 +4,7 @@ RSpec.describe Point, type: :model do
   let(:trace) { create(:trace) }
   let(:poin1_data) {{ "latitude": 32.9377784729004, "longitude": -117.230392456055 }}
   let(:poin2_data) {{ "latitude": 32.937801361084, "longitude": -117.230323791504 }}
+  let(:poin3_data) {{ "latitude": 32.9378204345703, "longitude": -117.230278015137 }}
 
   it { expect(subject).to belong_to(:trace) }
   it { expect(subject).to validate_presence_of(:longitude) }
@@ -26,15 +27,39 @@ RSpec.describe Point, type: :model do
     expect(Point).to have_received(:import).with(new_points)
   end
 
-  it 'should build trace points' do
-    new_point1 = build(:point, trace: trace)
-    new_point1.attributes = poin1_data
-    new_point2 = build(:point, trace: trace)
-    new_point2.attributes = poin2_data
-    new_points = Point.send(:build_points, trace, [poin1_data, poin2_data])
+  describe 'should build trace points' do
+    let(:new_point1) { build(:point, trace: trace, latitude: poin1_data[:latitude], longitude: poin1_data[:longitude]) }
+    let(:new_point2) { build(:point, trace: trace, latitude: poin2_data[:latitude], longitude: poin2_data[:longitude]) }
+    let(:new_point3) { build(:point, trace: trace, latitude: poin3_data[:latitude], longitude: poin3_data[:longitude]) }
+    let(:distance_2_1) { new_point2.distance_to(new_point1).round(5) }
+    let(:distance_3_2) { new_point3.distance_to(new_point2).round(5) }
 
-    expect(new_points[0].attributes).to eq new_point1.attributes
-    expect(new_points[1].attributes).to eq new_point2.attributes
-    expect(new_points.count).to eq 2
+    it 'no points' do
+      expect(Point.send(:build_points, trace, nil)).to eq []
+    end
+
+    it 'no trace' do
+      expect(Point.send(:build_points, nil, [poin1_data, poin2_data])).to eq []
+    end
+
+    it 'trace does not have points yet' do
+      new_point2.distance = distance_2_1
+      new_point3.distance = distance_3_2 + new_point2.distance
+      new_points = Point.send(:build_points, trace, [poin1_data, poin2_data, poin3_data])
+
+      new_points.map(&:attributes).should match_array [new_point1, new_point2, new_point3].map(&:attributes)
+    end
+
+    it 'trace already has points' do
+      point1 = create(:point, trace: trace)
+      point2 = create(:point, trace: trace, distance: 20.3577574564)
+      distance_1 = new_point1.distance_to(point2).round(5)
+      new_point1.attributes = poin1_data.merge(distance: distance_1 + point2.distance)
+      new_point2.attributes = poin2_data.merge(distance: distance_2_1 + new_point1.distance)
+      new_point3.attributes = poin3_data.merge(distance: distance_3_2 + new_point2.distance)
+      new_points = Point.send(:build_points, trace, [poin1_data, poin2_data, poin3_data])
+
+      new_points.map(&:attributes).should match_array [new_point1, new_point2, new_point3].map(&:attributes)
+    end
   end
 end

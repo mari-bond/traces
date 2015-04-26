@@ -1,4 +1,6 @@
 class Point < ActiveRecord::Base
+  reverse_geocoded_by :latitude, :longitude
+
   belongs_to :trace
 
   validates :latitude, :longitude, :distance, presence: true, numericality: true
@@ -15,11 +17,22 @@ class Point < ActiveRecord::Base
 
     def build_points(trace, data)
       data ||= []
-      data.map { |point_data|
-        point = new point_data
-        point.trace = trace
-        point
-      }
+      points = []
+      if trace
+        last_trace_point = where(trace: trace).last
+        data.each do |point_data|
+          point = new point_data
+          point.trace = trace
+          if last_trace_point
+            distance_to_prev = point.distance_to(last_trace_point).round(5)
+            point.distance = distance_to_prev + last_trace_point.distance
+          end
+          last_trace_point = point
+          points << point
+        end
+      end
+
+      points
     end
   end
 end
