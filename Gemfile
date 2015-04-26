@@ -12,6 +12,7 @@ gem 'spring', :group => :development
 gem 'active_model_serializers', github: 'rails-api/active_model_serializers', branch: '0-8-stable'
 gem "activerecord-import", ">= 0.2.0"
 gem 'geocoder'
+gem 'faraday'
 
 group :development, :test do
   gem 'rspec-rails', '~> 3.0'
