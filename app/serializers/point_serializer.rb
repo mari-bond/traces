@@ -1,3 +1,3 @@
 class PointSerializer < ActiveModel::Serializer
-  attributes :latitude, :longitude
+  attributes :latitude, :longitude, :distance
 end

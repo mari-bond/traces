@@ -10,6 +10,8 @@ RSpec.describe Point, type: :model do
   it { expect(subject).to validate_presence_of(:latitude) }
   it { expect(subject).to validate_numericality_of(:longitude) }
   it { expect(subject).to validate_numericality_of(:latitude) }
+  it { expect(subject).to validate_presence_of(:distance) }
+  it { expect(subject).to validate_numericality_of(:distance).is_greater_than_or_equal_to(0) }
 
   it 'should create Point' do
     expect { create(:point) }.to change(Point, :count)

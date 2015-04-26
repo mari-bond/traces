@@ -1,7 +1,8 @@
 class Point < ActiveRecord::Base
   belongs_to :trace
 
-  validates :latitude, :longitude, presence: true, numericality: true
+  validates :latitude, :longitude, :distance, presence: true, numericality: true
+  validates_numericality_of :distance, greater_than_or_equal_to: 0
   validates_presence_of :trace
 
   class << self
