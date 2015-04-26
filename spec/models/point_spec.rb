@@ -13,6 +13,8 @@ RSpec.describe Point, type: :model do
   it { expect(subject).to validate_numericality_of(:latitude) }
   it { expect(subject).to validate_presence_of(:distance) }
   it { expect(subject).to validate_numericality_of(:distance).is_greater_than_or_equal_to(0) }
+  it { expect(subject).to validate_presence_of(:elevation) }
+  it { expect(subject).to validate_numericality_of(:elevation).is_greater_than_or_equal_to(0) }
 
   it 'should create Point' do
     expect { create(:point) }.to change(Point, :count)
@@ -28,11 +30,15 @@ RSpec.describe Point, type: :model do
   end
 
   describe 'should build trace points' do
-    let(:new_point1) { build(:point, trace: trace, latitude: poin1_data[:latitude], longitude: poin1_data[:longitude]) }
-    let(:new_point2) { build(:point, trace: trace, latitude: poin2_data[:latitude], longitude: poin2_data[:longitude]) }
-    let(:new_point3) { build(:point, trace: trace, latitude: poin3_data[:latitude], longitude: poin3_data[:longitude]) }
+    let(:new_point1) { build(:point, trace: trace, latitude: poin1_data[:latitude], longitude: poin1_data[:longitude], elevation: 11) }
+    let(:new_point2) { build(:point, trace: trace, latitude: poin2_data[:latitude], longitude: poin2_data[:longitude], elevation: 22) }
+    let(:new_point3) { build(:point, trace: trace, latitude: poin3_data[:latitude], longitude: poin3_data[:longitude], elevation: 33) }
     let(:distance_2_1) { new_point2.distance_to(new_point1).round(5) }
     let(:distance_3_2) { new_point3.distance_to(new_point2).round(5) }
+
+    before do
+      PointElevationFetcher.stub_chain(:new, :fetch).and_return([11, 22, 33])
+    end
 
     it 'no points' do
       expect(Point.send(:build_points, trace, nil)).to eq []

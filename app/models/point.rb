@@ -3,8 +3,8 @@ class Point < ActiveRecord::Base
 
   belongs_to :trace
 
-  validates :latitude, :longitude, :distance, presence: true, numericality: true
-  validates_numericality_of :distance, greater_than_or_equal_to: 0
+  validates :latitude, :longitude, :distance, :elevation, presence: true, numericality: true
+  validates_numericality_of :distance, :elevation, greater_than_or_equal_to: 0
   validates_presence_of :trace
 
   class << self
@@ -19,18 +19,19 @@ class Point < ActiveRecord::Base
       data ||= []
       points = []
       if trace
-        last_trace_point = where(trace: trace).last
+        last = where(trace: trace).last
         data.each do |point_data|
           point = new point_data
           point.trace = trace
-          if last_trace_point
-            distance_to_prev = point.distance_to(last_trace_point).round(5)
-            point.distance = distance_to_prev + last_trace_point.distance
+          if last
+            point.distance = point.distance_to(last).round(5) + last.distance
           end
-          last_trace_point = point
+          last = point
           points << point
         end
       end
+      elevations = PointElevationFetcher.new(points).fetch
+      points.map.with_index{|point, index| point.elevation = elevations[index] } if elevations
 
       points
     end
