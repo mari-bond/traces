@@ -27,3 +27,6 @@ Tasks:
 
   rake points:save_as_json             # Saves points as json and put to Trace
 
+Testing:
+
+  bundle exec rspec
