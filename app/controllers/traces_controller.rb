@@ -4,7 +4,7 @@ class TracesController < ApplicationController
   # GET /traces
   # GET /traces.json
   def index
-    @traces = Trace.includes(:points)
+    @traces = Trace.all
 
     render json: @traces
   end
@@ -53,14 +53,6 @@ class TracesController < ApplicationController
   end
 
   def find_trace
-    @trace = Rails.cache.fetch(trace_cache_key) do
-      Trace.includes(:points).find(params[:id])
-    end
-  end
-
-  def trace_cache_key
-    last_point_id = Point.in_trace(params[:id]).last.try(:id)
-
-    ['traces', params[:id], last_point_id].join("/")
+    @trace = Trace.find(params[:id])
   end
 end

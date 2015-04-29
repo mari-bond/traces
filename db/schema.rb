@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150426160324) do
+ActiveRecord::Schema.define(version: 20150428161535) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -31,6 +31,7 @@ ActiveRecord::Schema.define(version: 20150426160324) do
   create_table "traces", force: :cascade do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.text     "points"
   end
 
   add_foreign_key "points", "traces"
