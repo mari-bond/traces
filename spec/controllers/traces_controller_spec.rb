@@ -2,8 +2,6 @@ require 'rails_helper'
 
 describe TracesController do
   let(:trace) { create(:trace) }
-  let!(:point1) { create(:point, trace: trace) }
-  let!(:point2) { create(:point, trace: trace) }
   let(:poin1_data) {{ "latitude" => '32.9377784729004', "longitude" => '-117.230392456055' }}
   let(:poin2_data) {{ "latitude" => '32.937801361084', "longitude" => '-117.230323791504' }}
   let(:data) { [poin1_data, poin2_data] }

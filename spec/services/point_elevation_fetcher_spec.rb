@@ -2,9 +2,9 @@ require 'rails_helper'
 
 describe PointElevationFetcher do
   let(:service) { PointElevationFetcher }
-  let(:point1) { create(:point) }
-  let(:point2) { create(:point) }
-  let(:point3) { create(:point) }
+  let(:point1) { Point.new("latitude": 32.9377784729004, "longitude": -117.230392456055, 'distance': 0.045) }
+  let(:point2) { Point.new("latitude": 32.937801361084, "longitude": -117.230323791504, 'distance': 0.145) }
+  let(:point3) { Point.new("latitude": 32.9378204345703, "longitude": -117.230278015137, 'distance': 1.045) }
 
   before do
     stubs = Faraday::Adapter::Test::Stubs.new
