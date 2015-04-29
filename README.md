@@ -10,4 +10,9 @@ curl -i -X PUT -d @trace3.json http://localhost:3000/traces/3 --header "Content-
 
 curl -i -X DELETE http://localhost:3000/traces/3 --header "Content-Type: application/json"
 
-Run rake points_distance:update to calculate distance for existing Point records.
+Tasks:
+
+rake points:update_distance             # Calculates and updates distance for existing points
+
+rake points:update_elevation            # Calculates and updates elevation for existing points
+
