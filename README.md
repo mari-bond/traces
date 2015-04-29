@@ -2,7 +2,7 @@
 
 Entities:
 
-  Point - point of a trace. Includes gps coordinates (longitude, latitude), distance and elevation
+  Point - point of a trace. Includes gps coordinates (longitude, latitude), distance and elevation. 
   Trace - has array of points
 
 Functionality:
