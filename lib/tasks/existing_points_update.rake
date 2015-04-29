@@ -1,41 +1,17 @@
 require 'rake'
 
 namespace :points do
-  desc "Calculates and updates distance for existing points"
-  task :update_distance => :environment do
+  desc "Saves points as json and put to Trace"
+  task :save_as_json => :environment do
     updated_count = 0
     p "Updating:"
-    Trace.includes(:points).each do |trace|
-      last_trace_point = nil
-      trace.points.each do |point|
-        if last_trace_point
-          distance_to_prev = point.distance_to(last_trace_point).round(5)
-          distance = last_trace_point.distance + distance_to_prev
-          point.update_column(:distance, distance)
-          updated_count += 1
-        end
-        last_trace_point = point
-      end
+    Trace.all.each do |trace|
+      points_as_json = Trace.find_by_sql(["SELECT * FROM points WHERE trace_id = ?", trace.id])
+      .as_json(only: [:longitude, :latitude, :distance, :elevation])
+      trace.update_column(:points, points_as_json.to_json)
+      updated_count += 1
       print "*"
     end
-    p "Updated #{updated_count} points"
-  end
-
-  desc "Calculates and updates elevation for existing points"
-  task :update_elevation => :environment do
-    updated_count = 0
-    points_groups = Point.all.to_a.in_groups_of(100)
-    points_groups.each do |points_group|
-      points_group.reject!(&:blank?)
-      elevations = PointElevationFetcher.new(points_group).fetch
-      if elevations
-        points_group.each_with_index do |point, index|
-          point.update_column(:elevation, elevations[index])
-          updated_count += 1
-        end
-      end
-      print "*"
-    end
-    p "Updated #{updated_count} points"
+    p "Updated #{updated_count} traces"
   end
 end
